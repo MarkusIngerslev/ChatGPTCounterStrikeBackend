@@ -1,5 +1,6 @@
 package com.example.chatgptcounterstrike.api;
 
+
 import com.example.chatgptcounterstrike.dto.MyResponse;
 import com.example.chatgptcounterstrike.service.OpenAiService;
 import io.github.bucket4j.Bandwidth;
@@ -16,14 +17,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
-@RequestMapping("/api/v1/roulette")
+@RequestMapping("/api/v1/questions")
 @CrossOrigin(origins = "*")
-public class RouletteController {
+public class QuestionsController {
 
-    /*
-    * Different values to limit the amount of requests that can be made to the ChatGPT API.
-    * And save money on the API usage.
-    * */
     @Value("${app.bucket_capacity}")
     private int BUCKET_CAPACITY;
 
@@ -33,26 +30,18 @@ public class RouletteController {
     @Value("${app.refill_time}")
     private int REFILL_TIME;
 
-    // The service that handles the requests to the ChatGPT API.
     private final OpenAiService service;
 
-    // The buckets that contain the rate limitations for the requests.
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
     /**
-     * This contains the message to the ChatGPT API,
-     * telling the AI how to should act in regard to the requests it gets.
+     * This contains the message to the ChatGPT API, telling the AI how to should act in regard to the requests it gets.
      */
     final static String SYSTEM_MESSAGE = "You are a coach for a Counter Strike 2 Team."+
-            " The user will ask you to provide them with a strategy in with they can use."+
-            " These are the only maps in the current map pool of Counter Strike 2: Mirage, Overpass, Ancient, Anubis, Vertigo, Inferno & Nuke."+
-            " If the user asks a question about Counter Strike: Global Offensive, you should tell the user that Counter Strike: Global Offensive does not exists anymore.";
+            " The user should provide you with a question about Counter Strike 2, and you should provide a detailed answer."+
+            " These are the only maps in the current map pool of Counter Strike 2: Mirage, Overpass, Ancient, Anubis, Vertigo, Inferno & Nuke.";
 
-    /**
-     * The controller called from the browser client.
-     * @param service
-     */
-    public RouletteController(OpenAiService service) {
+    public QuestionsController(OpenAiService service) {
         this.service = service;
     }
 
@@ -75,13 +64,13 @@ public class RouletteController {
     }
 
     /**
-     * Handles the request from the browser client.
+     * Handles the request from the browser.
      * @param about contains the input that ChatGPT uses to provide information about Counter-Strike.
      * @param request the HTTP request used
      * @return the response from ChatGPT.
      */
     @GetMapping
-    public MyResponse getRoulette(@RequestParam String about, HttpServletRequest request) {
+    public MyResponse getQuestion(@RequestParam String about, HttpServletRequest request) {
 
         // Get the IP address of the client
         String ip = request.getRemoteAddr();
@@ -90,10 +79,9 @@ public class RouletteController {
         // Does the request adhere to the IP-rate limitations?
         if (!bucket.tryConsume(1)) {
             // If not, tell the client "Too many requests"
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests");
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Too many requests, try again later");
         }
 
         return service.makeRequest(about,SYSTEM_MESSAGE);
     }
-
 }
