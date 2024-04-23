@@ -34,9 +34,6 @@ public class QuestionsController {
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    /**
-     * This contains the message to the ChatGPT API, telling the AI how to should act in regard to the requests it gets.
-     */
     final static String SYSTEM_MESSAGE = "You are a coach for a Counter Strike 2 Team."+
             " The user should provide you with a question about Counter Strike 2, and you should provide a detailed answer."+
             " These are the only maps in the current map pool of Counter Strike 2: Mirage, Overpass, Ancient, Anubis, Vertigo, Inferno & Nuke.";
@@ -63,12 +60,6 @@ public class QuestionsController {
         return buckets.computeIfAbsent(key, k -> createNewBucket());
     }
 
-    /**
-     * Handles the request from the browser.
-     * @param about contains the input that ChatGPT uses to provide information about Counter-Strike.
-     * @param request the HTTP request used
-     * @return the response from ChatGPT.
-     */
     @GetMapping
     public MyResponse getQuestion(@RequestParam String about, HttpServletRequest request) {
 

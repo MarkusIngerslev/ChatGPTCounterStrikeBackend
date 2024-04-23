@@ -96,14 +96,12 @@ public class OpenAiService {
             logger.error("Error response status code: " + e.getRawStatusCode());
             logger.error("Error response body: " + e.getResponseBodyAsString());
             logger.error("WebClientResponseException", e);
-            err = "Internal Server Error, due to a failed request to external service. You could try again" +
-                    "( While you develop, make sure to consult the detailed error message on your backend)";
+            err = "Internal Server Error, due to a failed request to external service. You could try again";
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, err);
         }
         catch (Exception e) {
             logger.error("Error", e);
-            err = "Internal Server Error, due to a failed request to external service. You could try again" +
-                    "( While you develop, make sure to consult the detailed error message on your backend)";
+            err = "Internal Server Error, due to a failed request to external service. You could try again";
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, err);
         }
     }

@@ -20,10 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @CrossOrigin(origins = "*")
 public class RouletteController {
 
-    /*
-    * Different values to limit the amount of requests that can be made to the ChatGPT API.
-    * And save money on the API usage.
-    * */
     @Value("${app.bucket_capacity}")
     private int BUCKET_CAPACITY;
 
@@ -39,19 +35,11 @@ public class RouletteController {
     // The buckets that contain the rate limitations for the requests.
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    /**
-     * This contains the message to the ChatGPT API,
-     * telling the AI how to should act in regard to the requests it gets.
-     */
     final static String SYSTEM_MESSAGE = "You are a coach for a Counter Strike 2 Team."+
             " The user will ask you to provide them with a strategy in with they can use."+
             " These are the only maps in the current map pool of Counter Strike 2: Mirage, Overpass, Ancient, Anubis, Vertigo, Inferno & Nuke."+
             " If the user asks a question about Counter Strike: Global Offensive, you should tell the user that Counter Strike: Global Offensive does not exists anymore.";
 
-    /**
-     * The controller called from the browser client.
-     * @param service
-     */
     public RouletteController(OpenAiService service) {
         this.service = service;
     }
@@ -74,12 +62,6 @@ public class RouletteController {
         return buckets.computeIfAbsent(key, k -> createNewBucket());
     }
 
-    /**
-     * Handles the request from the browser client.
-     * @param about contains the input that ChatGPT uses to provide information about Counter-Strike.
-     * @param request the HTTP request used
-     * @return the response from ChatGPT.
-     */
     @GetMapping
     public MyResponse getRoulette(@RequestParam String about, HttpServletRequest request) {
 
